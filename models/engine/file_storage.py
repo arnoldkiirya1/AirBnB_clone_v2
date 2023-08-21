@@ -1,60 +1,74 @@
 #!/usr/bin/python3
-"""AirBnB clone project File Storage"""
+"""
+Serializes instances to a JSON file and
+deserializes JSON file to instances.
+"""
+
 import json
+import os
 from models.base_model import BaseModel
 from models.user import User
+from models.place import Place
 from models.state import State
 from models.city import City
 from models.amenity import Amenity
-from models.place import Place
 from models.review import Review
+
+class_dict = {
+    "BaseModel": BaseModel,
+    "User": User,
+    "Place": Place,
+    "Amenity": Amenity,
+    "City": City,
+    "Review": Review,
+    "State": State
+}
+# Filestorage == type(self)
 
 
 class FileStorage:
-    """ This is a storage engine for AirBnB clone project
-    Class Methods:
-        all: Returns the object
-        new: updates the dictionary id
-        save: Serializes, or converts Python objects into JSON strings
-        reload: Deserializes, or converts JSON strings into Python objects.
-    Class Attributes:
-        __file_path (str): The name of the file to save objects to.
-        __objects (dict): A dictionary of instantiated objects.
-        class_dict (dict): A dictionary of all the classes.
+    """The file storage engine class, that is;
+    A class that serialize and deserialize instances to a JSON file
     """
-
-    __file_path = 'file.json'
+    __file_path = "file.json"
     __objects = {}
-    class_dict = {"BaseModel": BaseModel, "User": User, "Place": Place,
-                  "Amenity": Amenity, "City": City, "Review": Review,
-                  "State": State}
 
     def all(self):
-        """Return dictionary of <class>.<id> : object instance"""
+        """Returns the dictionary of objects"""
         return type(self).__objects
 
     def new(self, obj):
-        """Set new __objects to existing dictionary of instances"""
-        if obj:
-            key = '{}.{}'.format(obj.__class__.__name__, obj.id)
-            type(self).__objects[key] = obj
+        """Sets new obj in __objects dictionary."""
+        if obj.id in type(self).__objects:
+            print("exists")
+            return
+        key = "{}.{}".format(obj.__class__.__name__, obj.id)
+        type(self).__objects[key] = obj
+        # OR
+        # type(self).__objects[obj.id] = obj
 
     def save(self):
-        """Save/serialize obj dictionaries to json file"""
-        obj_dict = {}
-
-        for key, obj in type(self).__objects.items():
-            obj_dict[key] = obj.to_dict()
-        with open(type(self).__file_path, 'w', encoding="UTF-8") as f:
-            json.dump(obj_dict, f)
+        """serializes __objects to the JSON file (path: __file_path)"""
+        new_dict = []
+        for obj in type(self).__objects.values():
+            new_dict.append(obj.to_dict())
+            # for key, obj in type(self).__objects.items():
+            #    new_dict[key] = obj.to_dict()
+        with open(type(self).__file_path, "w", encoding='utf-8') as file:
+            json.dump(new_dict, file)
+            # OR
+            # with open(type(self).__file_path, "w", encoding="utf-8") as file:
+            #   json.dump([obj.to_dict() for obj in self.all().values()], file)
 
     def reload(self):
-        """Deserialize/convert obj dicts back to instances, if it exists"""
-        try:
-            with open(type(self).__file_path, 'r', encoding="UTF-8") as f:
-                new_obj_dict = json.load(f)
-                for key, value in new_obj_dict.items():
-                    obj = self.class_dict[value['__class__']](**value)
-                    type(self).__objects[key] = obj
-        except FileNotFoundError:
-            pass
+        """Deserializes the JSON file to __objects if it exists"""
+        if os.path.exists(type(self).__file_path) is True:
+            return
+            try:
+                with open(type(self).__file_path, "r") as file:
+                    new_obj = json.load(file)
+                    for key, val in new_obj.items():
+                        obj = self.class_dict[val['__class__']](**val)
+                        type(self).__objects[key] = obj
+            except Exception:
+                pass
