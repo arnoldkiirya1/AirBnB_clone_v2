@@ -94,27 +94,39 @@ class HBNBCommand(cmd.Cmd):
         try:
             if not line:
                 raise SyntaxError()
-            my_list = line.split(" ")
+            params = line.split(" ")
+            class_name = params[0]
+            param_list = params[1:]
 
             kwargs = {}
-            for i in range(1, len(my_list)):
-                key, value = tuple(my_list[i].split("="))
-                if value[0] == '"':
-                    value = value.strip('"').replace("_", " ")
-                else:
-                    try:
-                        value = eval(value)
-                    except (SyntaxError, NameError):
+            for param in param_list:
+                key_value = param.split("=")
+                if len(key_value) != 2:
+                    continue
+
+                key, value = key_value
+                value = value.replace("\\\"", "\"")
+                value = value.replace("_", " ")
+
+                try:
+                    if value.startswith('"') and value.endswith('"'):
+                        value = value[1:-1]
+                    elif "." in value:
+                        value = float(value)
+                    else:
+                        value = int(value)
+                except ValueError:
                         continue
+                
                 kwargs[key] = value
 
-            if kwargs == {}:
-                obj = eval(my_list[0])()
+            if kwargs:
+                class_instance = globals()[class_name](**kwargs)
+                storage.new(class_instance)
+                class_instance.save()
+                print(class_instance.id)
             else:
-                obj = eval(my_list[0])(**kwargs)
-                storage.new(obj)
-            print(obj.id)
-            obj.save()
+                print("Invalid Parameters")
 
         except SyntaxError:
             print("** class name missing **")
