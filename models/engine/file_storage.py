@@ -32,9 +32,16 @@ class FileStorage:
     __file_path = "file.json"
     __objects = {}
 
-    def all(self):
-        """Returns the dictionary of objects"""
-        return type(self).__objects
+    def all(self, cls=None):
+        """Returns the dictionary of objects."""
+        if not cls:
+            return self.__objects
+        elif type(cls) == str:
+            return {key: value for key, value in self.__objects.items()
+                    if value.__class__.__name__ == cls}
+        else:
+            return {key: value for key, value in self.__objects.items()
+                    if value.__class__ == cls}
 
     def new(self, obj):
         """Adds new object to storage dictionary"""
@@ -60,3 +67,12 @@ class FileStorage:
                         self.__objects[obj_dict["__class__"] + "." + obj_dict["id"]] = obj_instance
             except Exception as e:
                 pass  # Handle exceptions appropriately based on your needs
+
+    def delete(self, obj=None):
+        """ deletes an object from __objects if inside """
+        if obj is not None:
+            key = "{}.{}".format(obj.__class__.__name__, obj.id)
+            if key in self.__objects:
+                del self.__objects[key]
+                self.save()
+
