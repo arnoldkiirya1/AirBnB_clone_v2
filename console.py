@@ -130,14 +130,14 @@ class HBNBCommand(cmd.Cmd):
                         value = value.replace("_", " ")
                         try:
                             value = eval(value)
-                        except:
+                        except (ValueError, SyntaxError, NameError):
                             pass
                         setattr(new_instance, key, value)
                 except (ValueError, IndexError):
                     pass
             new_instance.save()
             print(new_instance.id)
-        except:
+        except NameError:
             print("** class doesn't exist **")
             return
 
@@ -202,7 +202,7 @@ class HBNBCommand(cmd.Cmd):
         key = c_name + "." + c_id
 
         try:
-            del(storage.all()[key])
+            del (storage.all()[key])
             storage.save()
         except KeyError:
             print("** no instance found **")

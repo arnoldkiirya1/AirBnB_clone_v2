@@ -6,11 +6,17 @@ import MySQLdb
 from models.state import State
 from models.engine.db_storage import DBStorage
 
+
 class TestDBStorageWithMySQL(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Connect to the test MySQL database
-        cls.db = MySQLdb.connect(host="localhost", user="testuser", passwd="testpass", db="testdb")
+        cls.db = MySQLdb.connect(
+                host="localhost",
+                user="testuser",
+                passwd="testpass",
+                db="testdb"
+                )
         cls.cursor = cls.db.cursor()
 
         # Set up DBStorage and create tables
@@ -44,6 +50,7 @@ class TestDBStorageWithMySQL(unittest.TestCase):
         self.cursor.execute("SELECT COUNT(*) FROM states")
         count = self.cursor.fetchone()[0]
         return count
+
 
 if __name__ == "__main__":
     unittest.main()
