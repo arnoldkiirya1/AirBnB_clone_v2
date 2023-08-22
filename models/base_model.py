@@ -26,7 +26,9 @@ class BaseModel():
         date_format = '%Y-%m-%dT%H:%M:%S.%f'
         if kwargs:
             for key, value in kwargs.items():
-                if "created_at" == key:
+                if "id" == key:
+                    self.id = value
+                elif "created_at" == key:
                     self.created_at = datetime.strptime(kwargs["created_at"],
                                                         date_format)
                 elif "updated_at" == key:

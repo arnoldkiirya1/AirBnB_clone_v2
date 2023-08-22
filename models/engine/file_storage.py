@@ -23,7 +23,6 @@ class_dict = {
     "Review": Review,
     "State": State
 }
-# Filestorage == type(self)
 
 
 class FileStorage:
@@ -38,37 +37,26 @@ class FileStorage:
         return type(self).__objects
 
     def new(self, obj):
-        """Sets new obj in __objects dictionary."""
-        if obj.id in type(self).__objects:
-            print("exists")
-            return
-        key = "{}.{}".format(obj.__class__.__name__, obj.id)
-        type(self).__objects[key] = obj
-        # OR
-        # type(self).__objects[obj.id] = obj
+        """Adds new object to storage dictionary"""
+        self.__objects["{}.{}".format(type(obj).__name__, obj.id)] = obj
 
     def save(self):
         """serializes __objects to the JSON file (path: __file_path)"""
         new_dict = []
         for obj in type(self).__objects.values():
             new_dict.append(obj.to_dict())
-            # for key, obj in type(self).__objects.items():
-            #    new_dict[key] = obj.to_dict()
         with open(type(self).__file_path, "w", encoding='utf-8') as file:
             json.dump(new_dict, file)
-            # OR
-            # with open(type(self).__file_path, "w", encoding="utf-8") as file:
-            #   json.dump([obj.to_dict() for obj in self.all().values()], file)
 
     def reload(self):
         """Deserializes the JSON file to __objects if it exists"""
-        if os.path.exists(type(self).__file_path) is True:
-            return
+        if os.path.exists(type(self).__file_path):
             try:
-                with open(type(self).__file_path, "r") as file:
-                    new_obj = json.load(file)
-                    for key, val in new_obj.items():
-                        obj = self.class_dict[val['__class__']](**val)
-                        type(self).__objects[key] = obj
-            except Exception:
-                pass
+                with open(type(self).__file_path, "r", encoding="utf-8") as file:
+                    obj_dict_list = json.load(file)
+                    for obj_dict in obj_dict_list:
+                        obj_class = class_dict[obj_dict["__class__"]]
+                        obj_instance = obj_class(**obj_dict)
+                        self.__objects[obj_dict["__class__"] + "." + obj_dict["id"]] = obj_instance
+            except Exception as e:
+                pass  # Handle exceptions appropriately based on your needs
