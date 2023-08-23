@@ -1,26 +1,22 @@
 #!/usr/bin/python3
-# Tests for class Amenity
-import unittest
+""" """
+from tests.test_models.test_base_model import test_basemodel
 from models.amenity import Amenity
+import os
 
 
-class TestAmenity(unittest.TestCase):
-    def test_attributes(self):
-        amenity = Amenity()
-        self.assertTrue(hasattr(amenity, 'id'))
-        self.assertTrue(hasattr(amenity, 'created_at'))
-        self.assertTrue(hasattr(amenity, 'updated_at'))
-        self.assertTrue(hasattr(amenity, 'name'))
+class test_Amenity(test_basemodel):
+    """ amenity test class"""
 
-    def test_name_default_value(self):
-        amenity = Amenity()
-        self.assertEqual(amenity.name, "")
+    def __init__(self, *args, **kwargs):
+        """inti the test class """
+        super().__init__(*args, **kwargs)
+        self.name = "Amenity"
+        self.value = Amenity
 
-    def test_name_assignment(self):
-        amenity = Amenity()
-        amenity.name = "Swimming Pool"
-        self.assertEqual(amenity.name, "Swimming Pool")
-
-
-if __name__ == '__main__':
-    unittest.main()
+    def test_name2(self):
+        """testing name type """
+        new = self.value()
+        self.assertEqual(type(new.name), str if
+                         os.getenv('HBNB_TYPE_STORAGE') != 'db' else
+                         type(None))
