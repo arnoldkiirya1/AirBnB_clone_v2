@@ -206,6 +206,57 @@ class TestFileStorage(unittest.TestCase):
         self.assertEqual(count_user_after, count_user_before + 1)
         self.assertEqual(count_state_after, count_state_before + 1)
 
+    def test_delete_instance_and_reload(self):
+        """Test deleting an instance and reloading"""
+        user = User()
+        self.storage.new(user)
+        self.storage.save()
+        self.storage.delete(user)
+        self.storage.reload()
+        all_objects = self.storage.all()
+        self.assertNotIn('User.' + user.id, all_objects)
+
+    def test_count_instances_multiple_classes(self):
+        """Test counting instances of multiple classes"""
+        count_user_before = len(self.storage.all(User))
+        count_state_before = len(self.storage.all(State))
+        user = User()
+        state = State()
+        self.storage.new(user)
+        self.storage.new(state)
+        self.storage.save()
+        count_user_after = len(self.storage.all(User))
+        count_state_after = len(self.storage.all(State))
+        self.assertEqual(count_user_after, count_user_before + 1)
+        self.assertEqual(count_state_after, count_state_before + 1)
+
+    def test_all_with_specific_class(self):
+        """Test retrieving instances of a specific class"""
+        user1 = User()
+        user2 = User()
+        state = State()
+        self.storage.new(user1)
+        self.storage.new(user2)
+        self.storage.new(state)
+        self.storage.save()
+        all_users = self.storage.all(User)
+        self.assertIn('User.' + user1.id, all_users)
+        self.assertIn('User.' + user2.id, all_users)
+        self.assertNotIn('State.' + state.id, all_users)
+
+    def test_get_instance(self):
+        """Test retrieving an instance by class name and ID"""
+        user = User()
+        self.storage.new(user)
+        self.storage.save()
+        retrieved_user = self.storage.get(User, user.id)
+        self.assertEqual(retrieved_user, user)
+
+    def test_get_nonexistent_instance(self):
+        """Test retrieving a nonexistent instance"""
+        retrieved_user = self.storage.get(User, 'nonexistent_id')
+        self.assertIsNone(retrieved_user)
+
 
 if __name__ == '__main__':
     unittest.main()
