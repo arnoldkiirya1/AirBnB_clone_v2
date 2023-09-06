@@ -27,11 +27,6 @@ sudo ln -s /data/web_static/releases/test/ /data/web_static/current
 sudo chown -R ubuntu:ubuntu /data/
 
 #nginx config to serve content
-config_text="location /hbnb_static/ {
-    alias /data/web_static/current/;
-    index index.html;
-}"
-
-sudo sed -i "/default_server/a $config_text" /etc/nginx/sites-available/default
+sudo sed -i '/listen 80 default_server/a location /hbnb_static { alias /data/web_static/current/;}' /etc/nginx/sites-enabled/default
 
 sudo service nginx restart
