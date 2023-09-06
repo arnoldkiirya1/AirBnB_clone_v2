@@ -11,14 +11,9 @@ fi
 sudo mkdir -p /data/web_static/releases/test/
 sudo mkdir -p /data/web_static/shared/
 
+touch /data/web_static/releases/test/index.html
 #fake HTML for testing
-echo "<html>
-  <head>
-  </head>
-  <body>
-    <p>Hello, This is a test.</p>
-  </body>
-</html>" | sudo tee /data/web_static/releases/test/index.html
+echo "Hello, This is a test." > /data/web_static/releases/test/index.html
 
 #handling symbolic link
 sudo rm -rf /data/web_static/current
