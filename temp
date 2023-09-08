@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
-# script that sets up the web servers for web_static deployment
-
-# Install Nginx if not already installed
+# script that sets up web servers for web_static
 sudo apt-get update
 sudo apt-get -y install nginx
 sudo ufw allow 'Nginx HTTP'
@@ -20,12 +18,16 @@ sudo echo "<html>
   </body>
 </html>" | sudo tee /data/web_static/releases/test/index.html
 
-# Create or recreate the symbolic link
-sudo ln -s -f /data/web_static/releases/test/ /data/web_static/current
+sudo rm -rf /data/web_static/current
+sudo ln -s /data/web_static/releases/test/ /data/web_static/current
 
-# Give ownership to the ubuntu user and group recursively
 sudo chown -R ubuntu:ubuntu /data/
 
-sudo sed -i '/listen 80 default_server/a location /hbnb_static { alias /data/web_static/current/;}' /etc/nginx/sites-enabled/default
+config="location /hbnb_static/ {
+    alias /data/web_static/current/;
+}"
+sudo sed -i "38i\\
+$config
+" /etc/nginx/sites-available/default
 
 sudo service nginx restart
