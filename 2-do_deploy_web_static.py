@@ -4,8 +4,8 @@ from fabric.api import *
 from os import path
 
 
-env.user = 'ubuntu'
 env.hosts = ['100.25.34.61', '100.25.180.211']
+env.user = 'ubuntu'
 env.key_filename = '~/.ssh/school'
 
 
@@ -30,12 +30,12 @@ def do_deploy(archive_path):
         # organize file structure
         run('sudo mv /data/web_static/releases/web_static_{}/web_static/* \
 /data/web_static/releases/web_static_{}/'.format(time_stamp, time_stamp))
-        
-        # remove current symbolic link
-        run('sudo rm -rf /data/web_static/current')
 
         # cleaning up
         run('sudo rm -rf /data/web_static/releases/web_static_{}/web_static/'.format(time_stamp))
+
+        # remove current symbolic link
+        run('sudo rm -rf /data/web_static/current')
 
         # build new symbolic link
         run('sudo ln -s /data/web_static/releases/web_static_{}/ /data/web_static/current'.format(time_stamp))
