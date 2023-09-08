@@ -1,6 +1,6 @@
 #!/usr/bin/python3
-from fabric.api import local
-from datetime import date
+"""deploy archive on web server"""
+from fabric.api import *
 from os import path
 
 
@@ -43,5 +43,3 @@ def do_deploy(archive_path):
         return False
 
     return True
-
-
