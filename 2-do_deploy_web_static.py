@@ -1,22 +1,13 @@
 #!/usr/bin/python3
 from fabric.api import local
 from datetime import date
-from time import strftime
+from os import path
 
 
-def do_pack():
-    """ Script that archives contents of web_static folder """
+env.user = ubuntu
+env.hosts = ['100.25.34.61', '100.25.180.211']
+env.key_filename = ~/.ssh/school
 
-    time_stamp = strftime("%Y%m%d%H%M%S")
-    try:
-        local("mkdir -p versions")
-        local("tar -czf versions/web_static_{}.tgz web_static/"
-              .format(time_stamp))
-
-        return "versions/web_static_{}.tgz".format(time_stamp)
-
-    except Exception as e:
-        return None
 
 def do_deploy(archive_path):
     """ script that distributes an archive to your web servers """
