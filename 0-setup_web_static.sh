@@ -20,7 +20,7 @@ sudo echo "<html>
   </body>
 </html>" | sudo tee /data/web_static/releases/test/index.html
 
-# Create or recreate the symbolic link
+# Create or recreate the symbolic link using
 sudo ln -s -f /data/web_static/releases/test/ /data/web_static/current
 
 # Give ownership to the ubuntu user and group recursively
