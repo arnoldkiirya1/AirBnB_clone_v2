@@ -1,45 +1,51 @@
 #!/usr/bin/python3
-"""deploy archive on web server"""
+"""Fabric script to deploy archive to web servers"""
+import os
 from fabric.api import *
-from os import path
+from datetime import datetime
 
-
-env.hosts = ['100.25.34.61', '100.25.180.211']
-env.user = 'ubuntu'
-env.key_filename = '~/.ssh/school'
-
+# Set your server IP addresses here
+env.hosts = ['<54.237.67.184 web-01>', '<54.165.90.9 web-02>']
+env.user = 'ubuntu' 
+env.key_filename = '~/.ssh/id_rsa' 
 
 def do_deploy(archive_path):
-    """ script that distributes an archive to your web servers """
+    """
+    Distributes an archive to your web servers and deploys it
+    Args:
+        archive_path: The path to the archive on the local machine
+    Returns:
+        True if successful, False otherwise
+    """
+    if not os.path.exists(archive_path):
+        return False
+
     try:
-        if not (path.exists(archive_path)):
-            return False
+        archive_filename = os.path.basename(archive_path)
+        archive_no_ext = os.path.splitext(archive_filename)[0]
 
+        # Upload the archive to /tmp/ directory on the server
         put(archive_path, '/tmp/')
-        time_stamp = archive_path[-18:-4]
-        
-        # create folder to uncompress into
-        run('sudo mkdir -p /data/web_static/releases/web_static_{}'.format(time_stamp))
-        
-        # uncompress archive
-        run('sudo tar -xzf /tmp/web_static_{}.tgz -C /data/web_static/releases/web_static_{}'.format(time_stamp, time_stamp))
 
-        #remove archive
-        run('sudo rm /tmp/web_static_{}.tgz'.format(time_stamp))
+        # Create the release directory
+        run('mkdir -p /data/web_static/releases/{}'.format(archive_no_ext))
 
-        # organize file structure
-        run('sudo mv /data/web_static/releases/web_static_{}/web_static/* \
-/data/web_static/releases/web_static_{}/'.format(time_stamp, time_stamp))
+        # Uncompress the archive to the release directory
+        run('tar -xzf /tmp/{} -C /data/web_static/releases/{}'.format(archive_filename, archive_no_ext))
 
-        # cleaning up
-        run('sudo rm -rf /data/web_static/releases/web_static_{}/web_static/'.format(time_stamp))
+        # Delete the uploaded archive
+        run('rm /tmp/{}'.format(archive_filename))
 
-        # remove current symbolic link
-        run('sudo rm -rf /data/web_static/current')
+        # Move files to proper location
+        run('mv /data/web_static/releases/{}/web_static/* /data/web_static/releases/{}'.format(
+            archive_no_ext, archive_no_ext))
+        run('rm -rf /data/web_static/releases/{}/web_static'.format(archive_no_ext))
 
-        # build new symbolic link
-        run('sudo ln -s /data/web_static/releases/web_static_{}/ /data/web_static/current'.format(time_stamp))
+        # Remove old symlink and create a new one
+        run('rm -rf /data/web_static/current')
+        run('ln -s /data/web_static/releases/{} /data/web_static/current'.format(archive_no_ext))
+
+        return True
     except:
         return False
 
-    return True
