@@ -1,30 +1,56 @@
 #!/usr/bin/python3
-# Fabfile to delete out-of-date archives.
+"""Fabric script to clean up outdated archives"""
+from fabric.api import local, env, run
+from datetime import datetime
 import os
-from fabric.api import *
 
-env.hosts = ["54.237.67.184", "54.165.90.9"]
+env.hosts = ['<54.237.67.184 web-01>', '<54.165.90.9 web-02>']
+env.user = 'ubuntu' 
+env.key_filename = '~/.ssh/id_rsa' 
 
 
 def do_clean(number=0):
-    """Delete out-of-date archives.
+    """Deletes out-of-date archives."""
+    try:
+        number = int(number)
+    except ValueError:
+        return
 
-    Args:
-        number (int): The number of archives to keep.
+    if number < 0:
+        return
 
-    If number is 0 or 1, keeps only the most recent archive. If
-    number is 2, keeps the most and second-most recent archives,
-    etc.
-    """
-    number = 1 if int(number) == 0 else int(number)
+    if number == 0 or number == 1:
+        number = 1
+    else:
+        number += 1
 
-    archives = sorted(os.listdir("versions"))
-    [archives.pop() for i in range(number)]
+    # Delete outdated archives in the versions folder
     with lcd("versions"):
-        [local("rm ./{}".format(a)) for a in archives]
+        local("ls -t | tail -n +{} | xargs -I {{}} rm -f {{}}".format(number))
 
+    # Delete outdated archives in the web_static/releases folder
     with cd("/data/web_static/releases"):
-        archives = run("ls -tr").split()
-        archives = [a for a in archives if "web_static_" in a]
-        [archives.pop() for i in range(number)]
-        [run("rm -rf ./{}".format(a)) for a in archives]
+        run("ls -t | tail -n +{} | xargs -I {{}} rm -rf {{}}".format(number))
+
+
+def do_clean_remote(number=0):
+    """Deletes out-of-date archives on remote servers."""
+    try:
+        number = int(number)
+    except ValueError:
+        return
+
+    if number < 0:
+        return
+
+    if number == 0 or number == 1:
+        number = 1
+    else:
+        number += 1
+
+    # Delete outdated archives in the versions folder on remote servers
+    run("cd ~/AirBnB_clone_v2/versions && ls -t | tail -n +{} | xargs -I {{}} rm -f {{}}".format(number))
+
+    # Delete outdated archives in the web_static/releases folder on remote servers
+    run("cd /data/web_static/releases && ls -t | tail -n +{} | xargs -I {{}} rm -rf {{}}".format(number))
+
