@@ -1,0 +1,82 @@
+section.filters {
+    background-color: #FFFFFF;
+    height: 70px;
+    width: 100%;
+    border: 1px solid #DDDDDD;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+}
+section.filters button {
+    font-size: 18px;
+    background-color: #FF5A5F;
+    color: #FFFFFF;
+    height: 48px;
+    width: 20%;
+    border: 0;
+    border-radius: 4px;
+    margin-left: auto;
+    margin-right: 20px;
+}
+section.filters button:hover {
+    opacity: 90%;
+}
+
+div.locations > ul.dropdown, div.amenities > ul.dropdown {
+    display: none; /* Hidden by default */
+    position: absolute; /* Position the dropdown */
+    list-style: none;
+    border: 1px solid #DDDDDD;
+    background-color: #FAFAFA;
+    margin: 0;
+    padding: 20px;
+    border-radius: 4px;
+    width: 100%; /* Same width as the parent div (filter div) */
+    z-index: 999; /* Ensure it appears above other content */
+}
+
+/* Additional CSS to style the nested lists */
+div.locations > ul.dropdown li, div.amenities > ul.dropdown li {
+    padding-left: 0; /* Reset the padding to align with the parent div */
+    margin: 10px 0;
+}
+
+div.locations > ul.dropdown li h2, div.amenities > ul.dropdown li h2 {
+    font-size: 16px; /* State name in h2 tag (font size 16px) */
+    margin-bottom: 4px;
+}
+
+/* Hierarchical dropdown styling */
+div.locations > ul.dropdown ul, div.amenities > ul.dropdown ul {
+    margin-left: 30px; /* Indentation for cities */
+}
+
+/* Display the nested dropdown on hover */
+div.locations:hover > ul.dropdown, div.amenities:hover > ul.dropdown {
+    display: block;
+}
+
+/* Additional style for the inner dropdown h2 (Benjamin) */
+div.locations > ul.dropdown li h2.inner_dd {
+    margin-top: 30px;
+}
+
+/* Additional style for the inner dropdown cities (p tags) */
+div.locations > ul.dropdown li p, div.amenities > ul.dropdown li p {
+    padding-left: 50px;
+    margin: 6px;
+}
+div.locations h3, div.amenities h3 {
+    font-weight: 600;
+    margin-bottom: 0;
+    margin-left: 50px;
+    font-size: 16px;
+}
+
+div.locations h4, div.amenities h4 {
+    font-weight: 400;
+    font-size: 14px;
+    margin: 5px auto;
+    margin-left: 50px;
+    margin-bottom: 16px;
+}
